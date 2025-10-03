@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# قائمة المهام - Todo App
 
-## Getting Started
+تطبيق ويب لإدارة المهام اليومية مبني باستخدام Next.js 15.5.4 و React 19.2.0 مع واجهة عصرية وتصميم متجاوب.
 
-First, run the development server:
+## ✨ المميزات
 
+- ➕ إضافة مهام جديدة
+- ✏️ تعديل المهام الموجودة
+- ✅ تحديد المهام كمكتملة/نشطة
+- ❌ حذف المهام
+- 🔍 فلترة المهام: الكل / المكتملة / النشطة
+- 🎨 دعم الوضع الليلي/الفاتح
+- 💾 حفظ البيانات في LocalStorage
+- 📱 واجهة متجاوبة
+- ⏱️ حركات أنيميشن باستخدام Framer Motion
+- 🌐 دعم اللغة العربية مع RTL
+
+## 🛠️ التقنيات المستخدمة
+
+- **Framework**: Next.js 15.5.4
+- **Library**: React 19.2.0
+- **Styling**: TailwindCSS
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Fonts**: Inter & Cairo
+- **Language**: TypeScript
+
+## 🚀 التشغيل المحلي
+
+1. استنسخ المشروع:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd todo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. تثبيت التبعيات:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. تشغيل خادم التطوير:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. افتح [http://localhost:3000](http://localhost:3000) في المتصفح
 
-## Learn More
+## 📱 الاستخدام
 
-To learn more about Next.js, take a look at the following resources:
+1. **إضافة مهمة**: اكتب النص في حقل الإدخال واضغط Enter أو انقر على أيقونة الإرسال
+2. **تعديل مهمة**: انقر على أيقونة التعديل بجانب المهمة
+3. **تحديد مكتملة**: انقر على مربع الاختيار بجانب المهمة
+4. **حذف مهمة**: انقر على أيقونة الحذف بجانب المهمة
+5. **فلترة المهام**: استخدم التبويبات في الأعلى للتبديل بين الكل/النشطة/المكتملة
+6. **تبديل الوضع**: انقر على أيقونة الشمس/القمر في الزاوية العلوية
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 التصميم
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **الألوان الأساسية**: 
+  - Primary: #4F46E5 (Indigo)
+  - Secondary: #06B6D4 (Cyan)
+  - Accent: #FACC15 (Yellow)
+- **الخطوط**: Inter (للإنجليزية) و Cairo (للعربية)
+- **التصميم**: بطاقات دائرية، ظلال ناعمة، تباين ألوان
 
-## Deploy on Vercel
+## 📦 البناء والنشر
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# بناء المشروع للإنتاج
+npm run build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# تشغيل نسخة الإنتاج محلياً
+npm start
+```
+
+## 🤝 المساهمة
+
+نرحب بالمساهمات! يرجى فتح issue أو pull request.
+
+## 📄 الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT.
+
+---
+
+تم البناء بـ ❤️ باستخدام Next.js و React
