@@ -2,8 +2,8 @@ export interface Todo {
   id: string;
   text: string;
   completed: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export type FilterType = 'all' | 'active' | 'completed';
@@ -14,7 +14,7 @@ export interface TodoState {
 }
 
 export type TodoAction =
-  | { type: 'ADD_TODO'; payload: { text: string } }
+  | { type: 'ADD_TODO'; payload: { text: string; todo?: Todo } }
   | { type: 'TOGGLE_TODO'; payload: { id: string } }
   | { type: 'EDIT_TODO'; payload: { id: string; text: string } }
   | { type: 'DELETE_TODO'; payload: { id: string } }

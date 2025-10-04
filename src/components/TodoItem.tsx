@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Edit2, Trash2, X, Save } from 'lucide-react';
 import { Todo } from '@/lib/types';
 import { formatDate } from '@/lib/utils';
+import { ClientOnly } from './ClientOnly';
 
 interface TodoItemProps {
   todo: Todo;
@@ -126,9 +127,11 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
                 >
                   {todo.text}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formatDate(todo.updatedAt)}
-                </p>
+                <ClientOnly fallback={<p className="text-xs text-muted-foreground mt-1">--</p>}>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatDate(todo.updatedAt)}
+                  </p>
+                </ClientOnly>
               </motion.div>
             )}
           </AnimatePresence>
@@ -145,7 +148,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
             >
               <motion.button
                 onClick={() => setIsEditing(true)}
-                className="p-1 text-muted-foreground hover:text-primary-500 hover:bg-primary-50 rounded"
+                className="p-1 text-muted-foreground hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -153,7 +156,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
               </motion.button>
               <motion.button
                 onClick={() => onDelete(todo.id)}
-                className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded"
+                className="p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20 rounded"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >

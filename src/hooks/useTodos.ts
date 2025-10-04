@@ -1,7 +1,7 @@
 'use client';
 
-import { useReducer, useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { useReducer, useEffect, useCallback } from 'react';
+import { useAuth } from '@/components/AuthProvider';
 import { Todo, TodoState, TodoAction, FilterType } from '@/lib/types';
 
 const initialState: TodoState = {
@@ -11,35 +11,35 @@ const initialState: TodoState = {
 
 function todoReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
-    case 'ADD_TODO':
-      const newTodo: Todo = {
-        id: Math.random().toString(36).substr(2, 9),
-        text: action.payload.text,
-        completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+        case 'ADD_TODO':
+          const newTodo: Todo = action.payload.todo || {
+            id: action.payload.text.replace(/\s+/g, '_') + '_' + Math.random().toString(36).substr(2, 9),
+            text: action.payload.text,
+            completed: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
       return {
         ...state,
         todos: [newTodo, ...state.todos],
       };
 
-    case 'TOGGLE_TODO':
-      return {
-        ...state,
-        todos: state.todos.map((todo) =>
-          todo.id === action.payload.id
-            ? { ...todo, completed: !todo.completed, updatedAt: new Date() }
-            : todo
-        ),
-      };
+        case 'TOGGLE_TODO':
+          return {
+            ...state,
+            todos: state.todos.map((todo) =>
+              todo.id === action.payload.id
+                ? { ...todo, completed: !todo.completed, updatedAt: new Date().toISOString() }
+                : todo
+            ),
+          };
 
     case 'EDIT_TODO':
       return {
         ...state,
         todos: state.todos.map((todo) =>
           todo.id === action.payload.id
-            ? { ...todo, text: action.payload.text, updatedAt: new Date() }
+            ? { ...todo, text: action.payload.text, updatedAt: new Date().toISOString() }
             : todo
         ),
       };
@@ -74,45 +74,155 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
 }
 
 export function useTodos() {
-  const [storedTodos, setStoredTodos] = useLocalStorage<Todo[]>('todos', []);
+  const { user, token } = useAuth();
   const [state, dispatch] = useReducer(todoReducer, initialState);
 
-  // Load todos from localStorage on mount
-  useEffect(() => {
-    if (storedTodos.length > 0) {
-      dispatch({ type: 'LOAD_TODOS', payload: { todos: storedTodos } });
+  const fetchTodos = useCallback(async () => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('/api/todos', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const todos = await response.json();
+        dispatch({ type: 'LOAD_TODOS', payload: { todos } });
+      }
+    } catch (error) {
+      console.error('Error fetching todos:', error);
     }
-  }, []);
+  }, [token]);
 
-  // Save todos to localStorage whenever todos change
+  // Load todos from API when user is logged in
   useEffect(() => {
-    if (state.todos.length > 0 || storedTodos.length > 0) {
-      setStoredTodos(state.todos);
+    if (user && token) {
+      fetchTodos();
     }
-  }, [state.todos, setStoredTodos]);
+  }, [user, token, fetchTodos]);
 
-  const addTodo = (text: string) => {
-    dispatch({ type: 'ADD_TODO', payload: { text } });
+  const addTodo = async (text: string) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text }),
+      });
+      
+      if (response.ok) {
+        const newTodo = await response.json();
+        dispatch({ type: 'ADD_TODO', payload: { text: newTodo.text, todo: newTodo } });
+      }
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
-  const toggleTodo = (id: string) => {
-    dispatch({ type: 'TOGGLE_TODO', payload: { id } });
+  const toggleTodo = async (id: string) => {
+    if (!token) return;
+    
+    const todo = state.todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          text: todo.text, 
+          completed: !todo.completed 
+        }),
+      });
+      
+      if (response.ok) {
+        dispatch({ type: 'TOGGLE_TODO', payload: { id } });
+      }
+    } catch (error) {
+      console.error('Error toggling todo:', error);
+    }
   };
 
-  const editTodo = (id: string, text: string) => {
-    dispatch({ type: 'EDIT_TODO', payload: { id, text } });
+  const editTodo = async (id: string, text: string) => {
+    if (!token) return;
+    
+    const todo = state.todos.find(t => t.id === id);
+    if (!todo) return;
+    
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          text, 
+          completed: todo.completed 
+        }),
+      });
+      
+      if (response.ok) {
+        dispatch({ type: 'EDIT_TODO', payload: { id, text } });
+      }
+    } catch (error) {
+      console.error('Error editing todo:', error);
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    dispatch({ type: 'DELETE_TODO', payload: { id } });
+  const deleteTodo = async (id: string) => {
+    if (!token) return;
+    
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        dispatch({ type: 'DELETE_TODO', payload: { id } });
+      }
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
   };
 
   const setFilter = (filter: FilterType) => {
     dispatch({ type: 'SET_FILTER', payload: { filter } });
   };
 
-  const clearCompleted = () => {
-    dispatch({ type: 'CLEAR_COMPLETED' });
+  const clearCompleted = async () => {
+    if (!token) return;
+    
+    const completedTodos = state.todos.filter(todo => todo.completed);
+    
+    try {
+      // Delete all completed todos
+      await Promise.all(
+        completedTodos.map(todo => 
+          fetch(`/api/todos/${todo.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          })
+        )
+      );
+      
+      dispatch({ type: 'CLEAR_COMPLETED' });
+    } catch (error) {
+      console.error('Error clearing completed todos:', error);
+    }
   };
 
   return {

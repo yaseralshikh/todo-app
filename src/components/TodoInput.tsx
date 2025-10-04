@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Send } from 'lucide-react';
-import { generateId } from '@/lib/utils';
-import { Todo } from '@/lib/types';
 
 interface TodoInputProps {
-  onAddTodo: (todo: Todo) => void;
+  onAddTodo: (text: string) => void;
 }
 
 export function TodoInput({ onAddTodo }: TodoInputProps) {
@@ -16,14 +14,7 @@ export function TodoInput({ onAddTodo }: TodoInputProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (text.trim()) {
-      const newTodo: Todo = {
-        id: generateId(),
-        text: text.trim(),
-        completed: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      onAddTodo(newTodo);
+      onAddTodo(text.trim());
       setText('');
     }
   };

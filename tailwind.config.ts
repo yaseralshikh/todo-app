@@ -63,6 +63,18 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        // Additional dark mode colors
+        "dark-primary": {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          900: "#0c4a6e",
+        },
+        "dark-accent": {
+          400: "#fbbf24",
+          500: "#f59e0b",
+        },
       },
       fontFamily: {
         sans: ["Inter", "Cairo", "system-ui", "sans-serif"],

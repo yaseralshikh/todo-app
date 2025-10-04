@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 
 export function useTheme() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Check for saved theme preference or default to 'light'
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -33,5 +35,5 @@ export function useTheme() {
     }
   };
 
-  return { theme, toggleTheme };
+  return { theme, toggleTheme, mounted };
 }

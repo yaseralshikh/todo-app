@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Cairo } from "next/font/google";
+import { AuthProvider } from '@/components/AuthProvider';
 import "./globals.css";
 
 const inter = Inter({
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
   description: "تطبيق ويب لإدارة المهام اليومية مع واجهة عصرية وتصميم متجاوب",
   keywords: ["todo", "tasks", "productivity", "arabic", "مهام", "إنتاجية"],
   authors: [{ name: "Todo App" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -30,7 +35,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${cairo.variable} font-sans antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
