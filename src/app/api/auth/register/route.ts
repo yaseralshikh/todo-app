@@ -22,44 +22,78 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    try {
+      // Check if user already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
 
-    if (existingUser) {
+      if (existingUser) {
+        return NextResponse.json(
+          { message: 'البريد الإلكتروني مستخدم بالفعل' },
+          { status: 400 }
+        );
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Create user
+      const user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      });
+
+      // Remove password from response
+      const { password: _, ...userWithoutPassword } = user;
+
+      // Generate token
+      const token = generateToken({
+        id: user.id,
+        email: user.email,
+        name: user.name || undefined,
+      });
+
       return NextResponse.json(
-        { message: 'البريد الإلكتروني مستخدم بالفعل' },
-        { status: 400 }
+        { message: 'تم إنشاء الحساب بنجاح', token, user: userWithoutPassword },
+        { status: 201 }
       );
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      
+      // Fallback: Create a temporary user without database
+      const tempUser = {
+        id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         name,
         email,
-        password: hashedPassword,
-      },
-    });
+        password: await bcrypt.hash(password, 12),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+      // Generate token
+      const token = generateToken({
+        id: tempUser.id,
+        email: tempUser.email,
+        name: tempUser.name || undefined,
+      });
 
-    // Generate token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      name: user.name || undefined,
-    });
+      // Remove password from response
+      const { password: _, ...userWithoutPassword } = tempUser;
 
-    return NextResponse.json(
-      { message: 'تم إنشاء الحساب بنجاح', token, user: userWithoutPassword },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        { 
+          message: 'تم إنشاء الحساب بنجاح (وضع مؤقت - قاعدة البيانات غير متاحة)', 
+          token, 
+          user: userWithoutPassword,
+          warning: 'هذا حساب مؤقت - سيتم فقدان البيانات عند إعادة تشغيل التطبيق'
+        },
+        { status: 201 }
+      );
+    }
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
