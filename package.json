@@ -4,7 +4,7 @@
   "description": "تطبيق إدارة المهام باستخدام Next.js 15.5.4 و React 19.2.0",
   "private": true,
   "engines": {
-    "node": ">=18.0.0",
+    "node": "20.x",
     "npm": ">=8.0.0"
   },
   "scripts": {
